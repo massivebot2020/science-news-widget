@@ -77,32 +77,39 @@
   </div>
 
   <script>
-    const rssUrl = 'https://news.google.com/rss/search?q=India+science&hl=en-IN&gl=IN&ceid=IN:en';
-    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+  const rssUrl = 'https://news.google.com/rss/search?q=India+science&hl=en-IN&gl=IN&ceid=IN:en';
+  const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
 
-    fetch(apiUrl)
-      .then(res => res.json())
-      .then(data => {
-        const list = document.getElementById('news-list');
-        list.innerHTML = '';
-        data.items.slice(0, 10).forEach(item => {
-          const thumbnail = item.enclosure?.link || 'https://via.placeholder.com/80x80?text=News';
-          const description = item.description.replace(/(<([^>]+)>)/gi, "").slice(0, 120) + '...';
+  fetch(apiUrl)
+    .then(res => res.json())
+    .then(data => {
+      const list = document.getElementById('news-list');
+      list.innerHTML = '';
 
-          const entry = `
-            <div class="news-item">
-              <img src="${thumbnail}" alt="thumbnail" class="news-thumbnail" />
-              <div class="news-content">
-                <a href="${item.link}" target="_blank" class="news-title">${item.title}</a>
-                <div class="news-description">${description}</div>
-              </div>
-            </div>`;
-          list.innerHTML += entry;
-        });
-      })
-      .catch(() => {
-        document.getElementById('news-list').innerHTML = '<p style="color:red;">Could not load news.</p>';
+      data.items.slice(0, 10).forEach(item => {
+        // Extract image from description if available
+        let imgMatch = item.description.match(/<img.*?src="(.*?)"/);
+        const thumbnail = imgMatch ? imgMatch[1] : 'https://via.placeholder.com/80x80?text=News';
+
+        const textOnlyDescription = item.description
+          .replace(/<img.*?>/, '')           // Remove image
+          .replace(/(<([^>]+)>)/gi, "")      // Remove remaining HTML
+          .slice(0, 120) + '...';
+
+        const entry = `
+          <div class="news-item">
+            <img src="${thumbnail}" alt="thumbnail" class="news-thumbnail" />
+            <div class="news-content">
+              <a href="${item.link}" target="_blank" class="news-title">${item.title}</a>
+              <div class="news-description">${textOnlyDescription}</div>
+            </div>
+          </div>`;
+        list.innerHTML += entry;
       });
-  </script>
+    })
+    .catch(() => {
+      document.getElementById('news-list').innerHTML = '<p style="color:red;">Could not load news.</p>';
+    });
+</script>
 </body>
 </html>
