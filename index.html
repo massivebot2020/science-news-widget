@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>India Science News</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      font-size: 14px;
+      margin: 0;
+      padding: 10px;
+      background: #f9f9f9;
+      color: #333;
+    }
+    h3 {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      margin-bottom: 8px;
+    }
+    a {
+      text-decoration: none;
+      color: #0077cc;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h3>🧪 Latest Science News from India</h3>
+  <ul id="news-list"><li>Loading...</li></ul>
+
+  <script>
+    const rssUrl = 'https://news.google.com/rss/search?q=India+science&hl=en-IN&gl=IN&ceid=IN:en';
+    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+
+    fetch(apiUrl)
+      .then(res => res.json())
+      .then(data => {
+        const list = document.getElementById('news-list');
+        list.innerHTML = '';
+        data.items.slice(0, 5).forEach(item => {
+          const li = document.createElement('li');
+          li.innerHTML = `<a href="${item.link}" target="_blank">${item.title}</a>`;
+          list.appendChild(li);
+        });
+      })
+      .catch(() => {
+        document.getElementById('news-list').innerHTML = '<li>Could not load news.</li>';
+      });
+  </script>
+</body>
+</html>
