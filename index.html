@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>India Science News</title>
+  <title>India Science News - The Hindu</title>
   <style>
     body {
       margin: 0;
@@ -72,44 +72,41 @@
 </head>
 <body>
   <div class="news-container">
-    <h3>🧪 Latest Science News from India</h3>
+    <h3>🧪 Latest Science News - The Hindu</h3>
     <div id="news-list">Loading...</div>
   </div>
 
   <script>
-  const rssUrl = 'https://news.google.com/rss/search?q=India+science&hl=en-IN&gl=IN&ceid=IN:en';
-  const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+    const rssUrl = 'https://www.thehindu.com/sci-tech/technology/feeder/default.rss';
+    const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
 
-  fetch(apiUrl)
-    .then(res => res.json())
-    .then(data => {
-      const list = document.getElementById('news-list');
-      list.innerHTML = '';
+    fetch(apiUrl)
+      .then(res => res.json())
+      .then(data => {
+        const list = document.getElementById('news-list');
+        list.innerHTML = '';
+        data.items.slice(0, 10).forEach(item => {
+          // Use thumbnail if available
+          const thumbnail = item.thumbnail || 'https://via.placeholder.com/80x80.png?text=News';
+          const description = item.description
+            .replace(/<img.*?>/, '')
+            .replace(/(<([^>]+)>)/gi, "")
+            .slice(0, 120) + '...';
 
-      data.items.slice(0, 10).forEach(item => {
-        // Extract image from description if available
-        let imgMatch = item.description.match(/<img.*?src="(.*?)"/);
-        const thumbnail = imgMatch ? imgMatch[1] : 'https://via.placeholder.com/80x80?text=News';
-
-        const textOnlyDescription = item.description
-          .replace(/<img.*?>/, '')           // Remove image
-          .replace(/(<([^>]+)>)/gi, "")      // Remove remaining HTML
-          .slice(0, 120) + '...';
-
-        const entry = `
-          <div class="news-item">
-            <img src="${thumbnail}" alt="thumbnail" class="news-thumbnail" />
-            <div class="news-content">
-              <a href="${item.link}" target="_blank" class="news-title">${item.title}</a>
-              <div class="news-description">${textOnlyDescription}</div>
-            </div>
-          </div>`;
-        list.innerHTML += entry;
+          const entry = `
+            <div class="news-item">
+              <img src="${thumbnail}" alt="thumbnail" class="news-thumbnail" />
+              <div class="news-content">
+                <a href="${item.link}" target="_blank" class="news-title">${item.title}</a>
+                <div class="news-description">${description}</div>
+              </div>
+            </div>`;
+          list.innerHTML += entry;
+        });
+      })
+      .catch(() => {
+        document.getElementById('news-list').innerHTML = '<p style="color:red;">Could not load news.</p>';
       });
-    })
-    .catch(() => {
-      document.getElementById('news-list').innerHTML = '<p style="color:red;">Could not load news.</p>';
-    });
-</script>
+  </script>
 </body>
 </html>
