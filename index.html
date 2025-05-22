@@ -5,36 +5,76 @@
   <title>India Science News</title>
   <style>
     body {
-      font-family: sans-serif;
-      font-size: 14px;
       margin: 0;
-      padding: 10px;
-      background: #f9f9f9;
-      color: #333;
+      padding: 20px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #0f0f0f;
+      color: #e0e0e0;
     }
+
+    .news-container {
+      background-color: #1a1a1a;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #00ffff33;
+    }
+
     h3 {
-      font-size: 16px;
-      margin-bottom: 10px;
+      font-size: 18px;
+      color: #00ffff;
+      border-bottom: 2px solid #00ffff;
+      padding-bottom: 8px;
+      margin-bottom: 20px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
-    ul {
-      list-style-type: none;
-      padding: 0;
+
+    .news-item {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #333;
+      padding-bottom: 12px;
     }
-    li {
-      margin-bottom: 8px;
+
+    .news-thumbnail {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 6px;
+      box-shadow: 0 0 5px #00ffff44;
     }
-    a {
+
+    .news-content {
+      flex: 1;
+    }
+
+    .news-title {
+      font-size: 14px;
+      color: #39ff14;
       text-decoration: none;
-      color: #0077cc;
+      font-weight: bold;
+      display: block;
+      margin-bottom: 6px;
+      transition: color 0.3s ease;
     }
-    a:hover {
-      text-decoration: underline;
+
+    .news-title:hover {
+      color: #00ffff;
+    }
+
+    .news-description {
+      font-size: 13px;
+      color: #ccc;
     }
   </style>
 </head>
 <body>
-  <h3>🧪 Latest Science News from India</h3>
-  <ul id="news-list"><li>Loading...</li></ul>
+  <div class="news-container">
+    <h3>🧪 Latest Science News from India</h3>
+    <div id="news-list">Loading...</div>
+  </div>
 
   <script>
     const rssUrl = 'https://news.google.com/rss/search?q=India+science&hl=en-IN&gl=IN&ceid=IN:en';
@@ -45,14 +85,23 @@
       .then(data => {
         const list = document.getElementById('news-list');
         list.innerHTML = '';
-        data.items.slice(0, 5).forEach(item => {
-          const li = document.createElement('li');
-          li.innerHTML = `<a href="${item.link}" target="_blank">${item.title}</a>`;
-          list.appendChild(li);
+        data.items.slice(0, 10).forEach(item => {
+          const thumbnail = item.enclosure?.link || 'https://via.placeholder.com/80x80?text=News';
+          const description = item.description.replace(/(<([^>]+)>)/gi, "").slice(0, 120) + '...';
+
+          const entry = `
+            <div class="news-item">
+              <img src="${thumbnail}" alt="thumbnail" class="news-thumbnail" />
+              <div class="news-content">
+                <a href="${item.link}" target="_blank" class="news-title">${item.title}</a>
+                <div class="news-description">${description}</div>
+              </div>
+            </div>`;
+          list.innerHTML += entry;
         });
       })
       .catch(() => {
-        document.getElementById('news-list').innerHTML = '<li>Could not load news.</li>';
+        document.getElementById('news-list').innerHTML = '<p style="color:red;">Could not load news.</p>';
       });
   </script>
 </body>
